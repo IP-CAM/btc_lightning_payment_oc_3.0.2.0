@@ -1,0 +1,74 @@
+<h2 class="payment_btc_lightning_title text-center">{{ text_instruction }}</h2>
+<div class="content" id="lightning_instructions" style="text-align:center">
+	{% if r_hash %}
+	  <p class="payment_btc_lightning_top_description">{{ text_description }}</p>
+	  <p class="payment_btc_lightning_wallet_address" style="word-break: break-all;">{{ payment_request }}</p>
+	  <p class="payment_btc_lightning_qr_code"><img src="https://api.qrserver.com/v1/create-qr-code/?data=lightning:{{ payment_request }}&amp;size=200x200"></p>
+	  <p class="payment_btc_lightning_order_time">{{ text_time_request }} <span id="payment_btc_lightning_countdown"></span> </p>
+	  <p class="payment_btc_lightning_pubkey">{{ text_pubkey_full }}</p>
+	  <p class="payment_btc_lightning_bottom_description">{{ text_payment }}</p>
+	{% else %}
+	<p class="payment_btc_lightning_wallet_address" style="word-break: break-all;">{{ payment_request }}</p>
+	{% endif %}
+</div>
+<div class="buttons">
+  <div class="pull-right">
+    <input type="button" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" data-loading-text="{{ text_loading }}" />
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-confirm').on('click', function() {
+	$.ajax({
+		type: 'get',
+		url: 'index.php?route=extension/payment/btc_lightning/confirm',
+		cache: false,
+		beforeSend: function() {
+			$('#button-confirm').button('loading');
+		},
+		complete: function() {
+			$('#button-confirm').button('reset');
+		},
+		success: function() {
+			location = '{{ continue }}';
+		}
+	});
+});
+//--></script>
+{% if r_hash %}
+<script type="text/javascript"><!--
+	var paymentstatus = setInterval(checkpaymentstatus, 5000);
+	$(function() {
+	    checkpaymentstatus();
+	});
+
+function checkpaymentstatus(){
+		$.ajax({
+			type: 'get',
+			url: 'index.php?route=extension/payment/btc_lightning/getPaymentStatus',
+			cache: false,
+			success: function(result){
+				if(result == true){
+					$('.payment_btc_lightning_title').text('Thank you, payment received');
+					$('#lightning_instructions').html('');
+					clearInterval(paymentstatus);
+				}else if(result == false){
+					console.log('not received');
+				}
+				},
+		});
+	}
+//--></script>
+{% endif %}
+<script>
+    function countdown(seconds) {
+		var counter = document.getElementById("payment_btc_lightning_countdown");
+		counter.innerHTML = Math.floor(seconds / 60) + ':' + ('0' + seconds % 60).slice(-2);
+		var timerinterval = setInterval(function(){
+			if( seconds > 0 ) {
+					seconds--;
+					counter.innerHTML = Math.floor(seconds / 60) + ':' + ('0' + seconds % 60).slice(-2);
+			}else{counter.innerHTML = '{{ text_timeleft }}'; clearInterval(timerinterval);}
+		}, 1000);
+    }
+    countdown('{{ sec_left }}');
+</script>
