@@ -15,7 +15,6 @@ $_['entry_lightning_node_pubkey']       = 'Pubkey@IpAddress:Port';
 
 $_['entry_total']        = 'Minimum order amount. Below this amount payment method will not be available.';
 $_['entry_add_percent']        = 'Additional fee % for this payment method';
-$_['entry_price_change_amount']        = 'Disable method if BTC price will change > n%';
 $_['entry_order_status'] = 'Order status:';
 $_['entry_status']       = 'Status:';
 $_['entry_sort_order']   = 'Order:';
